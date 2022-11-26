@@ -1,4 +1,4 @@
-module data_path
+module datapath
 import k_and_s_pkg::*;
 (
     input  logic                    rst_n,
@@ -37,15 +37,18 @@ logic ov_f;
 logic sov_f;
 logic carry_in_ultimo;
 
-logic [15:0] banco_reg [4]; 
+logic [15:0] banco_reg[4]; // banco de registradores
 
 always_ff @(posedge clk) begin
     if(ir_enable)
     instruction <= data_in;    
 end
 
-always_ff @(posedge clk) begin
-    if(pc_enable) begin
+always_ff @(posedge clk or negedge rst_n) begin
+    if(!rst_n) begin
+    program_counter = 'd0;
+    end
+    else if(pc_enable) begin
         if(branch)
         program_counter <= mem_addr;
         else
@@ -72,8 +75,8 @@ always_comb begin
         sov_f = 1'b0;
         carry_in_ultimo = 1'b0;  
     end
-    default : begin
-        //~(bus_b);
+    2'b11 : begin
+        bus_b = (~bus_b);
         bus_b = bus_b + 1;
         {carry_in_ultimo,alu_out[14:0]} = bus_a[14:0] + bus_b[14:0];
         {sov_f,alu_out[15]} = bus_a[15] + bus_b[15] + carry_in_ultimo;
@@ -173,12 +176,11 @@ assign bus_b = banco_reg[b_addr];
 
 assign bus_c = (c_sel?data_in:alu_out);
 
-always_comb begin
-banco_reg[c_addr] = bus_c;
+always_ff @(posedge clk) begin
+if(write_reg_enable) 
+ banco_reg[c_addr] = bus_c;
 end
 
-assign ram_addr = (addr_sel?mem_addr:program_counter);
+assign ram_addr = (addr_sel?program_counter:mem_addr);
 
-
-
-endmodule : data_path
+endmodule
