@@ -34,7 +34,13 @@ ADD,
 OR,
 AND,
 SUB,
-BRANCH
+BRANCH,
+BZERO,
+BNEG,
+BOV,
+BNOV,
+BNNEG,
+BNZERO
 }state_t;
 
 state_t state;
@@ -98,6 +104,26 @@ halt = 1'b0;
     end
     else if(decoded_instruction == I_BRANCH) begin
         next_state = BRANCH;
+        branch = 1'b1;
+    end
+     else if(decoded_instruction == I_BZERO) begin
+        next_state = BZERO;
+        branch = 1'b1;
+    end
+      else if(decoded_instruction == I_BOV) begin
+        next_state = BOV;
+        branch = 1'b1;
+    end
+      else if(decoded_instruction == I_BNOV) begin
+        next_state = BNOV;
+        branch = 1'b1;
+    end
+      else if(decoded_instruction == I_BNNEG) begin
+        next_state = BNNEG;
+        branch = 1'b1;
+    end
+      else if(decoded_instruction == I_BNZERO) begin
+        next_state = BNZERO;
         branch = 1'b1;
     end
     end
@@ -165,6 +191,36 @@ halt = 1'b0;
     end
 
     BRANCH : begin
+        next_state = BUSCA_INSTR;
+        pc_enable = 1'b1;
+    end
+
+    BZERO : begin
+        next_state = BUSCA_INSTR;
+        pc_enable = 1'b1;
+    end
+
+    BNEG : begin
+        next_state = BUSCA_INSTR;
+        pc_enable = 1'b1;
+    end
+
+    BOV : begin
+        next_state = BUSCA_INSTR;
+        pc_enable = 1'b1;
+    end
+
+    BNOV : begin
+        next_state = BUSCA_INSTR;
+        pc_enable = 1'b1;
+    end
+
+    BNNEG : begin
+        next_state = BUSCA_INSTR;
+        pc_enable = 1'b1;
+    end
+
+    BNZERO : begin
         next_state = BUSCA_INSTR;
         pc_enable = 1'b1;
     end
